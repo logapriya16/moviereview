@@ -60,3 +60,17 @@
   border-radius: 9px;
   padding: 0.7rem;
 }
+form {
+  margin: 2rem;
+}
+.label {
+  display: block;
+  padding: 0.4rem;
+  text-align: left;
+}
+.input {
+  display: inline;
+  margin: 0.3rem;
+  padding: 0.7rem;
+  width: 100%;
+}

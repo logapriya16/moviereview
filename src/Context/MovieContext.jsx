@@ -9,47 +9,59 @@ export default function MovieContextProvider({ children }) {
     stared: [],
   };
   const [moviestate, movieDispatch] = useReducer(movieReducer, movieInitial);
-  const [display, setDisplay] = useState(moviestate.movies);
   const [filters, setFilters] = useState({
     genre: "",
     year: 0,
     rating: 0,
+    search: "",
   });
+
   const AddtoWatchList = (movie) => {
-    //console.log(movie)
-    if (
-      moviestate.watchlist.length > 0 &&
-      moviestate.watchlist.map((item) => item.title === movie.title)
-    ) {
-      movieDispatch({
-        type: "set_watchlist",
-        payload: moviestate.watchlist.filter(
-          (item) => item.title != movie.title
-        ),
-      });
-    } else {
-      movieDispatch({
-        type: "set_watchlist",
-        payload: [...moviestate.watchlist, movie],
-      });
-    }
+    moviestate.watchlist.includes(movie)
+      ? movieDispatch({
+          type: "set_watchlist",
+          payload: moviestate.watchlist.filter(
+            (item) => item.title !== movie.title
+          ),
+        })
+      : movieDispatch({
+          type: "set_watchlist",
+          payload: [...moviestate.watchlist, movie],
+        });
   };
 
   const AddtoStared = (movie) => {
-    if (
-      moviestate.stared.length > 0 &&
-      moviestate.stared.map((item) => item.title === movie.title)
-    ) {
-      movieDispatch({
-        type: "set_stared",
-        payload: moviestate.stared.filter((item) => item.title != movie.title),
-      });
-    } else {
-      movieDispatch({
-        type: "set_stared",
-        payload: [...moviestate.stared, movie],
-      });
-    }
+    moviestate.stared.includes(movie)
+      ? movieDispatch({
+          type: "set_stared",
+          payload: moviestate.stared.filter(
+            (item) => item.title !== movie.title
+          ),
+        })
+      : movieDispatch({
+          type: "set_stared",
+          payload: [...moviestate.stared, movie],
+        });
+  };
+  const AddnewMovie = (e) => {
+    e.preventDefault();
+    const temp = {
+      title: e.target.elements.title.value,
+      year: e.target.elements.year.value,
+      genre: e.target.elements.genre.value,
+      rating: e.target.elements.rating.value,
+      director: e.target.elements.director.value,
+      writer: e.target.elements.writer.value,
+      cast: e.target.elements.cast.value,
+      summary:
+      e.target.elements.summary.value,
+      imageURL:e.target.elements.img.value,
+
+    };
+    const resetter = e.target.elements.reset
+    resetter.click()
+    console.log(temp)
+    movieDispatch({type:"set_movies",payload:[...moviestate.movies,temp]})
   };
   const HandleGnere = (e) => {
     setFilters((prev) => ({ ...prev, genre: e.target.value }));
@@ -60,20 +72,36 @@ export default function MovieContextProvider({ children }) {
   const HandleRating = (e) => {
     setFilters((prev) => ({ ...prev, rating: e.target.value }));
   };
+  const HandleSearch = (e) => {
+    setFilters((prev) => ({ ...prev, search: e.target.value }));
+  };
   //console.log(filters);
   const generFilter =
     filters.genre.length > 0
-      ? display.filter((item) => item.genre.includes(filters.genre))
-      : display;
+      ? moviestate.movies.filter((item) => item.genre.includes(filters.genre))
+      : moviestate.movies;
   const yearFilter =
     filters.year > 0
       ? generFilter.filter((item) => item.year == filters.year)
       : generFilter;
   // console.log(yearFilter);
+  //   console.log(
+  //     moviestate.movies.map((item) =>
+  //       item.cast.map((c)=>c===filters.search))
+  //     )
+
+  const searchFilter =
+    filters.search.length > 0
+      ? yearFilter.filter(
+          (item) =>
+            item.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+            item.director.toLowerCase().includes(filters.search.toLowerCase())
+        )
+      : yearFilter;
   const ratingFilter =
     filters.rating > 0
-      ? yearFilter.filter((item) => item.rating == filters.rating)
-      : yearFilter;
+      ? searchFilter.filter((item) => item.rating == filters.rating)
+      : searchFilter;
   //console.log(ratingFilter);
 
   return (
@@ -82,12 +110,13 @@ export default function MovieContextProvider({ children }) {
         moviestate,
         ratingFilter,
         setFilters,
+        HandleSearch,
         HandleYear,
         HandleGnere,
         HandleRating,
-        display,
         AddtoWatchList,
         AddtoStared,
+        AddnewMovie
       }}
     >
       {children}

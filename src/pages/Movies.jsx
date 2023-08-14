@@ -96,85 +96,47 @@ export default function Movies() {
           <option value="9">9</option>
           <option value="10">10</option>
         </select>
-        <button onClick={() => navigate("/newmovie")} className="new-movie">
+        <button onClick={() => navigate("/newmoview")} className="new-movie">
           Add Movie
         </button>
       </div>
       <div>
         <ul type="none" className="movie-list">
           {ratingFilter.length > 0 ? (
-            ratingFilter.map((movie) => (
-              <li className="each-movie">
-                <img
-                  src={movie.imageURL}
-                  alt=""
-                  height="400px"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/movie/${movie.title}`)}
-                />
-                <h2>{movie.title}</h2>
-                <p>{movie.summary}</p>
-                {moviestate.watchlist.length > 0 ? (
-                  moviestate.watchlist.map((item) =>
-                    item.title === movie.title ? (
-                      <button
-                        className="new-movie"
-                        onClick={(e) => AddtoWatchList(movie)}
-                      >
-                        Remove from watchlist
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => AddtoWatchList(movie)}
-                        className="new-movie"
-                      >
-                        Add to watchlist
-                      </button>
-                    )
-                  )
-                ) : (
+            ratingFilter.map((movie) => {
+              const isWatchlist = moviestate.watchlist.some(
+                (item) => item.title === movie.title
+              );
+              const isStared = moviestate.stared.some(
+                (item) => item.title === movie.title
+              );
+              console.log(isWatchlist);
+              return (
+                <li className="each-movie">
+                  <img
+                    src={movie.imageURL}
+                    alt=""
+                    height="400px"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/movie/${movie.title}`)}
+                  />
+                  <h2>{movie.title}</h2>
+                  <p>{movie.summary}</p>
                   <button
                     className="new-movie"
-                    style={{
-                      display:
-                        moviestate.watchlist.length > 0 ? "none" : "block",
-                    }}
                     onClick={() => AddtoWatchList(movie)}
                   >
-                    Add to Watchlist
+                    {isWatchlist ? "Remove from watchlist" : "Add to watchlist"}
                   </button>
-                )}
-                {moviestate.stared.length > 0 ? (
-                  moviestate.stared.map((item) =>
-                    item.title === movie.title ? (
-                      <button
-                        className="new-movie"
-                        onClick={(e) => AddtoStared(movie)}
-                      >
-                        Unstart
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => AddtoStared(movie)}
-                        className="new-movie"
-                      >
-                        Star
-                      </button>
-                    )
-                  )
-                ) : (
                   <button
                     className="new-movie"
-                    style={{
-                      display: moviestate.stared.length > 0 ? "none" : "block",
-                    }}
-                    onClick={() => AddtoStared(movie)}
+                    onClick={(e) => AddtoStared(movie)}
                   >
-                    Star
+                    {isStared ? "unstar" : "Star"}
                   </button>
-                )}
-              </li>
-            ))
+                </li>
+              );
+            })
           ) : (
             <h1>No Movies Found</h1>
           )}
